@@ -23,6 +23,14 @@ bigint::bigint(const std::string& nb)
 	pushNumber(snb);
 }
 
+bigint bigint::operator+(const bigint& other)
+{
+	bigint result;
+	int maxSize = this->value.size() >= other.value.size() ? this->value.size() : other.value.size();
+	
+	for (int)
+}
+
 const std::deque<unsigned int>& bigint::getValue() const {
 	return value;
 }
