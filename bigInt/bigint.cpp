@@ -23,12 +23,30 @@ bigint::bigint(const std::string& nb)
 	pushNumber(snb);
 }
 
-bigint bigint::operator+(const bigint& other)
+
+bigint bigint::operator+(const bigint& other) const
 {
-	bigint result;
-	int maxSize = this->value.size() >= other.value.size() ? this->value.size() : other.value.size();
-	
-	for (int)
+	bigint res;
+	res.value.clear();
+	size_t carry = 0;
+	size_t i = this->value.size();
+	size_t j = other.value.size();
+	size_t run = (j >= i) ? j : i;
+	while (run)
+	{
+		size_t a = (i > 0) ? this->value[--i] : 0;
+		size_t b = (j > 0) ? other.value[--j] : 0;
+
+		size_t result = a + b + carry;
+		carry = result / 10;
+		result = result % 10;
+
+		res.value.push_front(result);
+		run--;
+	}
+	if (carry)
+		res.value.push_front(carry);
+	return res;
 }
 
 const std::deque<unsigned int>& bigint::getValue() const {

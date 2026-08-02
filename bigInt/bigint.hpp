@@ -12,10 +12,9 @@ public:
 	bigint() {value.push_back(0);};
 	bigint(unsigned int );
 	bigint(const std::string& );
-	// bigint(const bigint& other);
 	const std::deque<unsigned int>& getValue() const;
 
-	bigint operator+(const bigint& other);
+	bigint operator+(const bigint& other) const;
 	friend std::ostream& operator<<(std::ostream& out, const bigint& ob);
 };
 
