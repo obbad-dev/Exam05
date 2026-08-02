@@ -50,12 +50,6 @@ bigint bigint::operator+(const bigint& other) const
 	return res;
 }
 
-// bigint bigint::operator+(unsigned int nb) const
-// {
-// 	std::cout << "2 here\n";
-// 	bigint obj(nb);
-// 	return bigint(*this + obj); 
-// }
 bigint& bigint::operator+=(const bigint& other)
 {
 	*this = *this + other;
@@ -127,9 +121,31 @@ bigint& bigint::operator>>=(const bigint& other)
     {
         *this >>= other.getNb();
     }
-
     return *this;
 }
+
+bool bigint::operator<(const bigint& other) const {
+	return this->getNb() < other.getNb();
+}
+bool bigint::operator>(const bigint& other) const {
+	return this->getNb() > other.getNb();
+}
+
+bool bigint::operator<=(const bigint& other) const {
+	return this->getNb() <= other.getNb();
+}
+bool bigint::operator>=(const bigint& other) const {
+	return this->getNb() >= other.getNb();
+}
+bool bigint::operator==(const bigint& other) const {
+	return this->getNb() == other.getNb();
+}
+bool bigint::operator!=(const bigint& other) const {
+	return this->getNb() !=other.getNb();
+}
+
+
+
 const std::deque<unsigned int>& bigint::getValue() const {
 	return value;
 }

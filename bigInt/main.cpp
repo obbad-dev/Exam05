@@ -29,10 +29,10 @@ int main ()
 
     std::cout << "(d < a) = " << (d < a) << std::endl;
     std::cout << "(d <= a) = " << (d <= a) << std::endl;
-    // std::cout << "(d > a) = " << (d > a) << std::endl;
-    // std::cout << "(d >= a) = " << (d >= a) << std::endl;
-    // std::cout << "(d == a) = " << (d == a) << std::endl;
-    // std::cout << "(d != a) = " << (d != a) << std::endl;
+    std::cout << "(d > a) = " << (d > a) << std::endl;
+    std::cout << "(d >= a) = " << (d >= a) << std::endl;
+    std::cout << "(d == a) = " << (d == a) << std::endl;
+    std::cout << "(d != a) = " << (d != a) << std::endl;
 
 	return 0;
 }
