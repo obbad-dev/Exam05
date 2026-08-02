@@ -1,6 +1,5 @@
 #include "bigint.hpp"
 #include <exception>
-#include <sstream>
 
 
 void bigint::pushNumber(unsigned int nb)
@@ -12,17 +11,10 @@ void bigint::pushNumber(unsigned int nb)
 	}
 }
 bigint::bigint(unsigned int nb){
+	if (!nb)
+		value.push_back(0);
 	pushNumber(nb);
 }
-
-bigint::bigint(const std::string& nb)
-{
-	std::stringstream ss(nb);
-	unsigned int  snb;
-	ss >> snb;
-	pushNumber(snb);
-}
-
 
 bigint bigint::operator+(const bigint& other) const
 {
@@ -70,7 +62,7 @@ bigint bigint::operator++(int)
 	return copy;
 }
 
-bigint bigint::operator<<(size_t shift) const
+bigint bigint::operator<<(UUL shift) const
 {
 	bigint copy(*this);
 	for (size_t i = 0; i < shift; i++)
@@ -83,14 +75,12 @@ bigint bigint::operator<<(size_t shift) const
 	return copy;
 }
 
-bigint bigint::operator>>(size_t shift) const {
+bigint bigint::operator>>(UUL shift) const {
 	bigint copy(*this);
 
 	if (shift >= copy.value.size())
-	{
-		copy.value.clear();
-		copy.value.push_back(0);	
-		return copy;
+	{	
+		return bigint();
 	}
 	for (size_t i = 0; i < shift; i++)
 		copy.value.pop_back();
@@ -98,13 +88,26 @@ bigint bigint::operator>>(size_t shift) const {
 	return copy;
 }
 
-bigint& bigint::operator<<=(size_t shift)
+bigint bigint::operator>>(const bigint& other) const
+{
+	bigint copy(*this);
+	copy = copy >> other.getNb();
+	return copy;
+}
+bigint bigint::operator<<(const bigint& other) const
+{
+	bigint copy(*this);
+	copy = copy << other.getNb();
+	return copy;
+}
+
+bigint& bigint::operator<<=(UUL shift)
 {
 	*this = *this << shift;
 	return *this;
 }
 
-bigint& bigint::operator>>=(size_t shift)
+bigint& bigint::operator>>=(UUL shift)
 {
 	*this = *this >> shift;
 	return *this;
@@ -112,46 +115,42 @@ bigint& bigint::operator>>=(size_t shift)
 
 bigint& bigint::operator>>=(const bigint& other)
 {
-    if (other.value.size() > 19 || other.getNb() >= this->value.size())
-    {
-        this->value.clear();
-		this->value.push_back(0);
-    }
-    else
-    {
-        *this >>= other.getNb();
-    }
+    *this >>= other.getNb();
     return *this;
 }
 
+bigint& bigint::operator<<=(const bigint& other)
+{
+	*this <<= other.getNb();
+	return *this;
+}
+
 bool bigint::operator<(const bigint& other) const {
-	return this->getNb() < other.getNb();
+	if (this->value.size() != other.value.size())
+		return this->value.size() < other.value.size();
+	return this->value < other.value;
 }
 bool bigint::operator>(const bigint& other) const {
-	return this->getNb() > other.getNb();
+	return  other < *this;
 }
-
 bool bigint::operator<=(const bigint& other) const {
-	return this->getNb() <= other.getNb();
+	return !(other < *this);
 }
 bool bigint::operator>=(const bigint& other) const {
-	return this->getNb() >= other.getNb();
+	return !(*this < other);
 }
 bool bigint::operator==(const bigint& other) const {
-	return this->getNb() == other.getNb();
+
+	if (this->value.size() != other.value.size())
+		return false;
+	return this->value == other.value;
 }
 bool bigint::operator!=(const bigint& other) const {
-	return this->getNb() !=other.getNb();
+	return !(*this == other);
 }
 
-
-
-const std::deque<unsigned int>& bigint::getValue() const {
-	return value;
-}
-
-size_t bigint::getNb() const{
-	size_t result = 0;
+UUL bigint::getNb() const{
+	UUL result = 0;
 	for (size_t i = 0; i < value.size(); ++i)
 	{
 		result = result * 10 + value[i];
@@ -160,10 +159,9 @@ size_t bigint::getNb() const{
 }
 
 std::ostream& operator<<(std::ostream& out, const bigint& ob){
-	const std::deque<unsigned int>& value = ob.getValue();
 
-	for (size_t i = 0; i < value.size(); i++)
-		out << value[i];
+	for (size_t i = 0; i < ob.value.size(); i++)
+		out << ob.value[i];
 		
 	return out;
 }
