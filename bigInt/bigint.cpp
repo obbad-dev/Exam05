@@ -28,6 +28,7 @@ bigint bigint::operator+(const bigint& other) const
 {
 	bigint res;
 	res.value.clear();
+
 	size_t carry = 0;
 	size_t i = this->value.size();
 	size_t j = other.value.size();
@@ -47,6 +48,72 @@ bigint bigint::operator+(const bigint& other) const
 	if (carry)
 		res.value.push_front(carry);
 	return res;
+}
+
+// bigint bigint::operator+(unsigned int nb) const
+// {
+// 	std::cout << "2 here\n";
+// 	bigint obj(nb);
+// 	return bigint(*this + obj); 
+// }
+bigint& bigint::operator+=(const bigint& other)
+{
+	*this = *this + other;
+	return *this;
+}
+
+bigint& bigint::operator++()
+{
+	bigint pre(1);
+	*this = *this + pre;
+	return *this;
+}
+
+bigint bigint::operator++(int)
+{
+	bigint copy(*this);
+	++(*this);
+	return copy;
+}
+
+bigint bigint::operator<<(size_t shift) const
+{
+	bigint copy(*this);
+	for (size_t i = 0; i < shift; i++)
+	{
+		if (copy.value.size() && copy.value[0] != 0)
+			copy.value.push_back(0);
+		else
+			break;
+	}
+	return copy;
+}
+
+bigint bigint::operator>>(size_t shift) const {
+	bigint copy(*this);
+
+	if (shift >= copy.value.size())
+	{
+		copy.value.clear();
+		copy.value.push_back(0);	
+		return copy;
+	}
+	for (size_t i = 0; i < shift; i++)
+		copy.value.pop_back();
+	
+	return copy;
+}
+
+bigint& bigint::operator<<=(size_t shift)
+{
+	*this = *this << shift;
+	return *this;
+}
+
+bigint& bigint::operator>>=(size_t shift)
+{
+	*this = *this >> shift;
+	return *this;
 }
 
 const std::deque<unsigned int>& bigint::getValue() const {
