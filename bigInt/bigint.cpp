@@ -116,8 +116,31 @@ bigint& bigint::operator>>=(size_t shift)
 	return *this;
 }
 
+bigint& bigint::operator>>=(const bigint& other)
+{
+    if (other.value.size() > 19 || other.getNb() >= this->value.size())
+    {
+        this->value.clear();
+		this->value.push_back(0);
+    }
+    else
+    {
+        *this >>= other.getNb();
+    }
+
+    return *this;
+}
 const std::deque<unsigned int>& bigint::getValue() const {
 	return value;
+}
+
+size_t bigint::getNb() const{
+	size_t result = 0;
+	for (size_t i = 0; i < value.size(); ++i)
+	{
+		result = result * 10 + value[i];
+	}
+	return result;
 }
 
 std::ostream& operator<<(std::ostream& out, const bigint& ob){
