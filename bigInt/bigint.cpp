@@ -1,7 +1,6 @@
 #include "bigint.hpp"
 #include <exception>
 
-
 void bigint::pushNumber(unsigned int nb)
 {
 	while (nb > 0)
