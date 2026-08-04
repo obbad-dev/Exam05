@@ -1,10 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "stdio.h"
+#include "stdlib.h"
 
 int slen(char *s)
 {
     int i = 0;
-    for( ;s[i];i++);
+    while (s[i])
+        i++;
     return i;
 }
 
@@ -17,75 +18,94 @@ int bsq(FILE *file)
 {
     char empty = 0, obstacle = 0, full = 0, extra = 0;
     int height = 0;
-    if(fscanf(file, "%d%c%c%c%c", &height, &empty, &obstacle, &full, &extra) != -5)
+    
+    // Fix 1: Strict header parsing (no space before %c, check trailing \n)
+    if (fscanf(file, "%d%c%c%c%c", &height, &empty, &obstacle, &full, &extra) != 5 || extra != '\n')
         return 1;
-    if(extra != '\n')
+    if (height <= 0 || empty == obstacle || empty == full || obstacle == full)
         return 1;
-    if(height <= 0 || empty == obstacle || empty == full || obstacle == full)
-        return 1;
-    char **map = calloc(height, sizeof(char *));
+
+    char** map = calloc(height, sizeof(char*));
+    int i = 0, w = 0;
     char *line = NULL;
     size_t len = 0;
-    int i = 0, w = 0;
-    for( ;getline(&line, &len, file)!=-1;i++)
+    for (; getline(&line, &len, file) != -1; i++)
     {
-        if(i == height)
+        if (i == height)
             return 1;
         map[i] = line;
         line = NULL;
         len = 0;
-        if(i == 0)
+        if (i == 0)
         {
-            w =slen(map[0]);
-            if(w < 2 || map[0][w-1]!='\n')
+            w = slen(map[0]);
+            if (w < 2 || map[0][w-1] != '\n')
                 return 1;
         }
-        else if(w != slen(map[i]) || map[i][w-1]!= '\n')
+        else if (w != slen(map[i]) || map[i][w-1] != '\n')
             return 1;
     }
-    if(i < height)
+    if (i < height)
         return 1;
-    int **dp = calloc(height+1, sizeof(int *));
+
+    int **dp = calloc(height + 1, sizeof(int*));
     int y = 0, x = 0, size = 0;
-    for(int i = 0; i <= height;i++)
-        dp[i] = calloc(w+1, sizeof(int));
-    for(int i = 0; i < height; i++)
+    for (int i = 0; i <= height; i++)
+        dp[i] = calloc(w + 1, sizeof(int));
+    for (int i = 0; i < height; i++)
     {
-        for(int j = 0; j < w-1;j++)
+        for (int j = 0; j < w - 1; j++)
         {
-            if(map[i][j] == empty)
+            if (map[i][j] == empty)
             {
-                dp[i+1][j+1] = 1 + min(dp[i][j],dp[i+1][j],dp[i][j+1]);
-                if(size < dp[i+1][j+1])
-                    y = i, x = j, size = dp[i+1][j+1];
+                dp[i+1][j+1] = 1 + min(dp[i][j], dp[i+1][j], dp[i][j+1]);
+                if (size < dp[i+1][j+1])
+                    y = i, x = j, size = dp[i+1][j+1]; 
             }
-            else if(map[i][j] != obstacle)
+            else if (map[i][j] != obstacle)
                 return 1;
         }
     }
-    for(int i = x - size+1;i <=x;i++)
+    for (int i = y - size + 1; i <= y; i++)
     {
-        for(int j = y - size+1;j<=y;j++)
+        for (int j = x - size + 1; j <= x; j++)
             map[i][j] = full;
     }
-    for(int i = 0; i < height;i++)
+    for (int i = 0; i < height; i++)
         fprintf(stdout, "%s", map[i]);
+
+    // Fix 2: Memory cleanup
+    for (int i = 0; i <= height; i++)
+        free(dp[i]);
+    free(dp);
+    for (int i = 0; i < height; i++)
+        free(map[i]);
+    free(map);
+
     return 0;
 }
+
 int main(int ac, char **av)
 {
-    if(ac == 1)
-        bsq(stdin);
-    else if(ac == 2)
+    // Fix 3: Print "Error: invalid map\n" to stdout
+    if (ac == 1)
     {
-        FILE *file = fopen(av[1], "r");
-        if(!file)
-            fprintf(stderr, "Error: cannot open the file\n");
-        if(bsq(file))
-            fprintf(stderr, "Error: invalid map\n");
-        fclose(file);
+        if (bsq(stdin)) 
+            fprintf(stdout, "Error: invalid map\n");
+    }
+    else if (ac > 1)
+    {
+        for (int i = 1; i < ac; i++)
+        {   
+            FILE *file = fopen(av[i], "r");
+            if (!file || bsq(file))
+                fprintf(stdout, "Error: invalid map\n");
+            if (file)
+                fclose(file);
+        }
     }
     else
-        fprint(stderr, "Error: invalid map\n");
+        fprintf(stdout, "Error: invalid map\n");
+
     return 0;
 }
